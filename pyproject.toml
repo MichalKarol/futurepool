@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "futurepool"
+version = "1.0.0"
+description = "FuturePool is a package that introduce known concept of multiprocessing Pool to the async/await world. It allows for easy translation from multiprocessing to async/await, while keeping the core principle - specified number of workers. FuturePool allows for more flexible usage by providing starimap/starimap_unordered."
+authors = ["Michal Karol <michal.p.karol@gmail.com>"]
+license = "MIT License"
+readme = "README.md"
+keywords = [
+    "async/await",
+    "worker",
+    "pool",
+    "scrappig",
+    "future",
+    "future pool",
+    "async pool",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Framework :: AsyncIO",
+    "Topic :: Software Development :: Libraries",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+]
+
+[tool.poetry.urls]
+Homepage = "https://michalkarol.github.io/futurepool/"
+Documentation = "https://michalkarol.github.io/futurepool/"
+Repository = "https://github.com/MichalKarol/futurepool"
+Issues = "https://github.com/MichalKarol/futurepool/issues"
+Releases = "https://github.com/MichalKarol/futurepool/releases"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+asyncio = "^3.4.3"
+ruff = "^0.7.0"
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

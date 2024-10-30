@@ -1,0 +1,7 @@
+.history
+__pycache__
+.venv
+dist
+site
+.cache
+.pytest_cache

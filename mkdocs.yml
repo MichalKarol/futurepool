@@ -1,0 +1,83 @@
+site_name: FuturePool
+
+nav:
+  - Home: index.md
+
+plugins: 
+  - search
+  - privacy
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            heading_level: 2
+            parameter_headings: true
+            signature_crossrefs: true
+            show_root_toc_entry: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: alphabetical
+            separate_signature: true
+            show_signature_annotations: true
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            allow_inspection: true
+            show_labels: false
+            relative_crossrefs: true
+            filters: 
+              - "!^_"
+              - "!^T$"
+              - "^__"
+repo_name: MichalKarol/futurepool
+repo_url: https://github.com/MichalKarol/futurepool
+
+theme:
+  name: material
+  font:
+    text: Roboto
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+  palette: 
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: lime
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+extra:
+  social:
+    - icon: fontawesome/brands/mastodon
+      link: https://mastodon.pl/@mkarol
+      name: mkarol on Mastodon
+    - icon: fontawesome/brands/github
+      link: https://github.com/MichalKarol
+      name: MichalKarol on Github
+
+    
+copyright: Copyright &copy; 2024 Michał Karol <michal.p.karol@gmail.com>
+
+validation:
+  omitted_files: warn
+  absolute_links: warn  
+  unrecognized_links: warn
+  anchors: warn  
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
