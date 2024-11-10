@@ -30,7 +30,9 @@ class FuturePool:
             return self
 
         async def __anext__(self) -> U:
-            future = next(self.iterator)
+            future = next(self.iterator, None)
+            if not future:
+                raise StopAsyncIteration()
             return await future
 
     def __init__(self, number_of_workers: int = (os.cpu_count() or 1)):
@@ -38,26 +40,28 @@ class FuturePool:
         assert number_of_workers > 0, "Number of workers must be a positive number"
         self.number_of_workers = number_of_workers
         self.loop = get_running_loop()
-        self.workers_locks = [asyncio.Lock() for _ in range(self.number_of_workers)]
+        self.workers_lock = asyncio.Semaphore(self.number_of_workers)
         self.tasks = set[Task]()
+        self.tasks_lock = asyncio.Lock()
 
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, type, value, traceback):
         if self.loop.is_running():
-            for lock in self.workers_locks:
-                await lock.acquire()
-            for task in self.tasks:
-                task.cancel()
-                try:
-                    await task
-                except asyncio.InvalidStateError:
-                    pass
-                except asyncio.CancelledError:
-                    pass
-            for lock in self.workers_locks:
-                lock.release()
+            for _ in range(self.number_of_workers):
+                await self.workers_lock.acquire()
+            async with self.tasks_lock:
+                for task in self.tasks:
+                    task.cancel()
+                    try:
+                        await task
+                    except asyncio.InvalidStateError:
+                        pass
+                    except asyncio.CancelledError:
+                        pass
+            for _ in range(self.number_of_workers):
+                self.workers_lock.release()
         return False
 
     def _get_iterator_(
@@ -70,6 +74,8 @@ class FuturePool:
         futures = list[Future[U]]()
         args = deque[tuple[int, T]]()
         not_finished_futures = deque[Future[U]]()
+        args_lock = asyncio.Lock()
+        not_finished_futures_lock = asyncio.Lock()
 
         def add_task():
             arg_tuple = next(iterator, None)
@@ -82,34 +88,44 @@ class FuturePool:
                 not_finished_futures.append(future)
             return True
 
-        async def worker(w_id: int):
-            while len(args) > 0:
-                async with self.workers_locks[w_id]:
-                    i, arg = args.popleft()
+        async def worker():
+            async with self.tasks_lock:
+                self.tasks.add(asyncio.current_task())
+            while True:
+                async with self.workers_lock:
+                    async with args_lock:
+                        if args:
+                            i, arg = args.popleft()
+                        else:
+                            break
                     try:
                         result = await fn(*arg)
-                        future = (
-                            futures[i] if ordered else not_finished_futures.popleft()
-                        )
+                        if ordered:
+                            future = futures[i]
+                        else:
+                            async with not_finished_futures_lock:
+                                future = not_finished_futures.popleft()
                         future.set_result(result)
                     except asyncio.InvalidStateError:
                         return
                     except asyncio.CancelledError:
                         return
                     except Exception as e:
-                        future = (
-                            futures[i] if ordered else not_finished_futures.popleft()
-                        )
+                        if ordered:
+                            future = futures[i]
+                        else:
+                            async with not_finished_futures_lock:
+                                future = not_finished_futures.popleft()
                         future.set_exception(e)
                     add_task()
-            self.tasks.remove(asyncio.current_task())
+            async with self.tasks_lock:
+                self.tasks.remove(asyncio.current_task())
 
         def create_workers():
-            for w_id in range(self.number_of_workers):
+            for _ in range(self.number_of_workers):
                 if not add_task():
                     return
-                task = self.loop.create_task(worker(w_id))
-                self.tasks.add(task)
+                self.loop.create_task(worker())
 
         class FutureIterator:
             def __init__(self):
@@ -124,7 +140,7 @@ class FuturePool:
 
                 if len(futures) == self.current:
                     if not add_task():
-                        raise StopIteration
+                        raise StopIteration()
                 future = futures[self.current]
                 self.current += 1
                 return future

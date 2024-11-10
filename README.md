@@ -1,5 +1,6 @@
-# FuturePool
-FuturePool is a package that introduce known concept of multiprocessing Pool to the async/await world. It allows for easy translation from multiprocessing to async/await, while keeping the core principle - specified number of workers. FuturePool allows for more flexible usage by providing starimap/starimap_unordered.
+# FuturePool [![PyPI - Version](https://img.shields.io/pypi/v/futurepool?style=for-the-badge)](https://pypi.org/project/futurepool/)
+
+FuturePool is a package that introduce known concept of multiprocessing Pool to the async/await world, resulting in async workers pool library. It allows for easy translation from multiprocessing to async/await, while keeping the core principle - specified number of workers. FuturePool allows for more flexible usage by providing starimap/starimap_unordered.
 
 FuturePool was created to handle web scrapping, where in order to not overwhelm website with connections and comply with website requirements, specified number of workers was used. FuturePool was extended to handle generic scenarios and published.
 

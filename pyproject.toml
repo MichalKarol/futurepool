@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "futurepool"
-version = "1.0.0"
-description = "FuturePool is a package that introduce known concept of multiprocessing Pool to the async/await world. It allows for easy translation from multiprocessing to async/await, while keeping the core principle - specified number of workers. FuturePool allows for more flexible usage by providing starimap/starimap_unordered."
+version = "1.0.1"
+description = "FuturePool is a package that introduce known concept of multiprocessing Pool to the async/await world, resulting in async workers pool library. It allows for easy translation from multiprocessing to async/await, while keeping the core principle - specified number of workers. FuturePool allows for more flexible usage by providing starimap/starimap_unordered."
 authors = ["Michal Karol <michal.p.karol@gmail.com>"]
 license = "MIT License"
 readme = "README.md"
